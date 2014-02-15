@@ -1,0 +1,17 @@
+spring:
+    yarn:
+        appName: xd-container
+        applicationDir: /xd/app/
+        fsUri: hdfs://localhost:8020
+        rmAddress: localhost:8032
+        schedulerAddress: localhost:8030
+        appmaster:
+            appmasterClass: org.springframework.yarn.am.StaticEventingAppmaster
+            containerCount: 2
+            containerRunner: org.springframework.xd.dirt.server.LauncherApplication
+            waitLatch: false
+            classpath:
+              - "./spring-xd-yarn.zip"
+              - "./spring-xd-yarn.zip/conf"
+              - "./spring-xd-yarn.zip/lib/*"
+              - "./spring-xd-yarn.zip/modules/processor/scripts"

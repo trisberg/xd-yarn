@@ -1,0 +1,85 @@
+// Apply the java plugin to add support for Java
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+ext {
+    springVersion = '4.0.0.RELEASE'
+    springBootVersion = '1.0.0.RC3'
+    springHadoopVersion = '2.0.0.M5'
+    hadoopVersion = '2.2.0'
+    slf4jVersion = '1.7.5'
+    junitVersion = '4.11'
+}
+
+buildscript {
+        repositories {
+                maven { url "http://repo.springsource.org/plugins-release" }
+        }
+        dependencies {
+                classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.0.RC3")
+        }
+}
+
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    mavenCentral()
+    maven { url "http://repo.springsource.org/libs-milestone" }
+}
+
+// In this section you declare the dependencies for your production and test code
+dependencies {
+    compile ("org.springframework.data:spring-yarn-boot:$springHadoopVersion") {
+            exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
+    }
+    runtime ("org.springframework.data:spring-data-hadoop:$springHadoopVersion") {
+            exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
+    }
+    runtime ("org.springframework.data:spring-data-hadoop-core:$springHadoopVersion") {
+            exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
+    }
+    compile ("org.springframework.boot:spring-boot:${springBootVersion}")
+    compile ("org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}")
+
+    runtime "log4j:log4j:1.2.16"
+    runtime "org.slf4j:slf4j-log4j12:1.6.4"
+    runtime "org.yaml:snakeyaml:1.12"
+
+    compile("org.springframework.data:spring-data-hadoop:$springHadoopVersion")
+    compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+    compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
+    // The production code uses the SLF4J logging API at compile time
+    compile "org.slf4j:slf4j-api:$slf4jVersion"
+}
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+task clientJar(type: Jar) {
+    appendix = 'client'
+    from sourceSets.main.output
+    exclude('**/AppMaster*')
+}
+
+task clientBoot(type: BootRepackage, dependsOn: clientJar) {
+    withJarTask = clientJar
+}
+
+task appmasterJar(type: Jar) {
+    appendix = 'appmaster'
+    from sourceSets.main.output
+    exclude('**/Client*')
+}
+
+task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
+    withJarTask = appmasterJar
+}
+
+clean.doLast {ant.delete(dir: "target")}
+
+jar.enabled = false
+
+bootRepackage.enabled = false
+
+build.dependsOn(clientBoot,appmasterBootJar)
