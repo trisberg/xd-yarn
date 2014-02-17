@@ -7,7 +7,8 @@ spring:
         schedulerAddress: localhost:8030
         appmaster:
             appmasterClass: org.springframework.yarn.am.StaticEventingAppmaster
-            containerCount: 2
+            memory: 512M
+            containerCount: 1
             containerRunner: org.springframework.xd.dirt.server.LauncherApplication
             waitLatch: false
             classpath:
