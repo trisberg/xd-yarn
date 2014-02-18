@@ -3,6 +3,8 @@ package org.springframework.xd.yarn;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
+import java.util.Map;
+
 @EnableAutoConfiguration
 public class AppMaster {
 

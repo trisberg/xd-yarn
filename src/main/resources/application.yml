@@ -1,0 +1,64 @@
+spring:
+    yarn:
+        applicationDir: /xd/app/
+        fsUri: hdfs://localhost:8020
+        rmAddress: localhost:8032
+        schedulerAddress: localhost:8030
+        client:
+            memory: 512M
+            files:
+                - "file:spring-xd-yarn.zip"
+                - "file:../build/libs/xd-yarn-appmaster-0.1.0.SNAPSHOT.jar"
+            appmasterFile: xd-yarn-appmaster-0.1.0.SNAPSHOT.jar
+---
+spring:
+    profiles: admin
+    yarn:
+        appName: xd-admin
+        client:
+            arguments:
+                -Dspring.profiles.active: "admin"
+                -Dspring.yarn.applicationDir: "${spring.yarn.applicationDir}"
+                -Dspring.yarn.fsUri: "${spring.yarn.fsUri}"
+                -Dspring.yarn.rmAddress: "${spring.yarn.rmAddress}"
+                -Dspring.yarn.schedulerAddress: "${spring.yarn.schedulerAddress}"
+        appmaster:
+            appmasterClass: org.springframework.yarn.am.StaticEventingAppmaster
+            containerRunner: org.springframework.xd.dirt.server.AdminServerApplication
+            containerCount: 1
+            arguments:
+                -DxdHomeDir: "./spring-xd-yarn.zip"
+                -DPORT: 9393
+                -Dspring.application.name: "admin"
+            waitLatch: false
+            classpath:
+                - "./spring-xd-yarn.zip"
+                - "./spring-xd-yarn.zip/config"
+                - "./spring-xd-yarn.zip/lib/*"
+---
+spring:
+    profiles: container
+    yarn:
+        appName: xd-container
+        client:
+            arguments:
+                -Dspring.profiles.active: "container"
+                -Dspring.yarn.appName: "${spring.yarn.appName}"
+                -Dspring.yarn.applicationDir: "${spring.yarn.applicationDir}"
+                -Dspring.yarn.fsUri: "${spring.yarn.fsUri}"
+                -Dspring.yarn.rmAddress: "${spring.yarn.rmAddress}"
+                -Dspring.yarn.schedulerAddress: "${spring.yarn.schedulerAddress}"
+                --spring.yarn.appmaster.containerCount: "${spring.xd.containers:1}"
+        appmaster:
+            appmasterClass: org.springframework.yarn.am.StaticEventingAppmaster
+            containerCount: 1
+            containerRunner: org.springframework.xd.dirt.server.LauncherApplication
+            arguments:
+                -DxdHomeDir: "./spring-xd-yarn.zip"
+                -Dspring.application.name: "container"
+            waitLatch: false
+            classpath:
+                - "./spring-xd-yarn.zip"
+                - "./spring-xd-yarn.zip/config"
+                - "./spring-xd-yarn.zip/lib/*"
+                - "./spring-xd-yarn.zip/modules/processor/scripts"
