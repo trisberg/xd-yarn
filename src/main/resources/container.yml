@@ -10,9 +10,10 @@ spring:
             memory: 512M
             containerCount: 1
             containerRunner: org.springframework.xd.dirt.server.LauncherApplication
+            arguments: {-DxdHomeDir: "./spring-xd-yarn.zip", -Dspring.application.name: "container"}
             waitLatch: false
             classpath:
               - "./spring-xd-yarn.zip"
-              - "./spring-xd-yarn.zip/conf"
+              - "./spring-xd-yarn.zip/config"
               - "./spring-xd-yarn.zip/lib/*"
               - "./spring-xd-yarn.zip/modules/processor/scripts"

@@ -4,3 +4,8 @@
 *.jar
 *.war
 *.ear
+/build/
+/.gradle/
+/xd-yarn.iml
+/xd-yarn.ipr
+/xd-yarn.iws

@@ -5,7 +5,7 @@ apply plugin: 'spring-boot'
 
 ext {
     springVersion = '4.0.0.RELEASE'
-    springBootVersion = '1.0.0.RC3'
+    springBootVersion = '1.0.0.RC1'
     springHadoopVersion = '2.0.0.M5'
     hadoopVersion = '2.2.0'
     slf4jVersion = '1.7.5'
@@ -17,7 +17,7 @@ buildscript {
                 maven { url "http://repo.springsource.org/plugins-release" }
         }
         dependencies {
-                classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.0.RC3")
+                classpath("org.springframework.boot:spring-boot-gradle-plugin:1.0.0.RC1")
         }
 }
 
@@ -28,16 +28,18 @@ repositories {
     maven { url "http://repo.springsource.org/libs-milestone" }
 }
 
+configurations {
+    bootRuntime {
+        exclude group: 'javax.servlet'
+        exclude group: 'org.mortbay.jetty'
+        exclude module: 'guice-servlet'
+    }
+}
+
 // In this section you declare the dependencies for your production and test code
 dependencies {
-    compile ("org.springframework.data:spring-yarn-boot:$springHadoopVersion") {
-            exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
-    }
-    runtime ("org.springframework.data:spring-data-hadoop:$springHadoopVersion") {
-            exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
-    }
-    runtime ("org.springframework.data:spring-data-hadoop-core:$springHadoopVersion") {
-            exclude group: "org.springframework.data", module: "spring-data-hadoop-batch"
+    compile ("org.springframework.data:spring-yarn-boot:$springHadoopVersion") { dep ->
+        exclude module: 'spring-data-hadoop-batch'
     }
     compile ("org.springframework.boot:spring-boot:${springBootVersion}")
     compile ("org.springframework.boot:spring-boot-autoconfigure:${springBootVersion}")
@@ -46,11 +48,13 @@ dependencies {
     runtime "org.slf4j:slf4j-log4j12:1.6.4"
     runtime "org.yaml:snakeyaml:1.12"
 
-    compile("org.springframework.data:spring-data-hadoop:$springHadoopVersion")
-    compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
-    compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
+//    compile("org.springframework.data:spring-data-hadoop:$springHadoopVersion")
+//    compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
+//    compile "org.apache.hadoop:hadoop-yarn-client:$hadoopVersion"
     // The production code uses the SLF4J logging API at compile time
     compile "org.slf4j:slf4j-api:$slf4jVersion"
+
+    bootRuntime configurations.runtime
 }
 
 sourceCompatibility = 1.6
@@ -64,6 +68,7 @@ task clientJar(type: Jar) {
 
 task clientBoot(type: BootRepackage, dependsOn: clientJar) {
     withJarTask = clientJar
+    customConfiguration = "bootRuntime"
 }
 
 task appmasterJar(type: Jar) {
@@ -74,6 +79,7 @@ task appmasterJar(type: Jar) {
 
 task appmasterBootJar(type: BootRepackage, dependsOn: appmasterJar) {
     withJarTask = appmasterJar
+    customConfiguration = "bootRuntime"
 }
 
 clean.doLast {ant.delete(dir: "target")}
@@ -82,4 +88,4 @@ jar.enabled = false
 
 bootRepackage.enabled = false
 
-build.dependsOn(clientBoot,appmasterBootJar)
+build.dependsOn(clientBoot, appmasterBootJar)

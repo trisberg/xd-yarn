@@ -10,9 +10,9 @@ spring:
             memory: 768M
             containerCount: 1
             containerRunner: org.springframework.xd.dirt.server.AdminServerApplication
-            arguments: {-Dxd.home: "file:./spring-xd-yarn.zip", -DPORT: 9393, -Dspring.application.name: "admin", -Dlogging.config: "file:./spring-xd-yarn.zip/config/xd-admin-logger.properties"}
+            arguments: {-DxdHomeDir: "./spring-xd-yarn.zip", -DPORT: 9393, -Dspring.application.name: "admin"}
             waitLatch: false
             classpath:
               - "./spring-xd-yarn.zip"
-              - "./spring-xd-yarn.zip/conf"
+              - "./spring-xd-yarn.zip/config"
               - "./spring-xd-yarn.zip/lib/*"
