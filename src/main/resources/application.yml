@@ -22,14 +22,15 @@ spring:
                 -Dspring.yarn.fsUri: "${spring.yarn.fsUri}"
                 -Dspring.yarn.rmAddress: "${spring.yarn.rmAddress}"
                 -Dspring.yarn.schedulerAddress: "${spring.yarn.schedulerAddress}"
+                -Dserver.port: "${PORT:${server.port:9393}}"
         appmaster:
             appmasterClass: org.springframework.yarn.am.StaticEventingAppmaster
             containerRunner: org.springframework.xd.dirt.server.AdminServerApplication
             containerCount: 1
             arguments:
                 -DxdHomeDir: "./spring-xd-yarn.zip"
-                -DPORT: 9393
                 -Dspring.application.name: "admin"
+                -DPORT: "${server.port}"
             waitLatch: false
             classpath:
                 - "./spring-xd-yarn.zip"

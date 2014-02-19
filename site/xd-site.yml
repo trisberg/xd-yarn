@@ -1,3 +1,6 @@
+server:
+    port: 9393
+
 spring:
     xd:
         adminServers: 1
